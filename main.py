@@ -55,18 +55,45 @@ def generate_class():
     classes = ["Fighter", "Wizard", "Rogue", "Cleric", "Barbarian", "Bard", "Druid", "Paladin", "Monk", "Ranger"]
     return random.choice(classes)
 
-def generate_background(stats, character_class):
-    background_templates = [
-        f"Born in a small village, your character developed {max(stats, key=stats.get)} from an early age. "
-        f"After a life-changing event, they decided to become a {character_class}.",
 
-        f"Your character grew up in a bustling city, where they honed their {max(stats, key=stats.get)}. "
-        f"Seeking adventure, they chose the path of a {character_class}.",
+# Получаем API-ключ и Folder ID
+API_KEY = os.getenv("YANDEX_API_KEY")
+FOLDER_ID = os.getenv("YANDEX_FOLDER_ID")
 
-        f"Raised in the wilderness, your character learned to rely on their {max(stats, key=stats.get)}. "
-        f"Now, they travel the world as a {character_class}."
-    ]
-    return random.choice(background_templates)
+def generate_text(prompt: str) -> str:
+    url = "https://llm.api.cloud.yandex.net/foundationModels/v1/completion"
+    headers = {
+        "Authorization": f"Api-Key {API_KEY}",
+        "x-folder-id": FOLDER_ID,
+    }
+    data = {
+        "modelUri": f"gpt://{FOLDER_ID}/yandexgpt-lite",
+        "completionOptions": {
+            "stream": False,
+            "temperature": 0.9,
+            "maxTokens": 2000,
+        },
+        "messages": [
+            {
+                "role": "user",
+                "text": prompt,
+            }
+        ],
+    }
+    response = requests.post(url, headers=headers, json=data)
+    if response.status_code == 200:
+        return response.json()["result"]["alternatives"][0]["message"]["text"]
+    else:
+        raise Exception(f"Ошибка генерации: {response.text}")
+
+# Пример использования
+
+
+
+
+
+
+
 
 def generate_character():
     # Генерация характеристик
@@ -77,8 +104,9 @@ def generate_character():
     character_class = generate_class()
     print("Generated Class:", character_class)
 
+
     # Генерация предыстории
-    background = generate_background(stats, character_class)
+    background = generate_text("create background for character, in middle age epoch, you have:" + str(stats) + str(character_class))
     print("Generated Background:", background)
 
     image_path = generate_image("Create a detailed full-body image of a character facing the viewer. The character should be visualized based on their background, class. Here are the details:Background: " + background + "Class: " + character_class + "The image should be realistic, with a focus on the character's face to convey their emotions and personality. The clothing and armor should match their class and background. The background should be neutral so as not to distract from the character itself. without text. character must be all on image. character in middle ages. in fantastic world. farmat: 768x768")
