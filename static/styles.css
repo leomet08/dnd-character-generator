@@ -46,3 +46,27 @@ h1 {
     height: auto;
     border-radius: 10px;
 }
+
+/* Адаптивные стили для мобильных устройств */
+@media (max-width: 768px) {
+    .container {
+        width: 95%;
+        padding: 10px;
+    }
+
+    h1 {
+        font-size: 24px;
+    }
+
+    .character-info h2, .character-info h3 {
+        font-size: 18px;
+    }
+
+    .character-info ul li {
+        padding: 8px;
+    }
+
+    .character-info img {
+        margin: 10px auto;
+    }
+}

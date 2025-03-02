@@ -159,32 +159,41 @@ def generate_class():
 import os
 import requests
 from dotenv import load_dotenv
+import time
 
 load_dotenv()  # Загружаем токен из .env
 
-def generate_image(prompt: str, model: str = "stabilityai/stable-diffusion-2-1"):
+def generate_image(prompt: str, model: str = "stabilityai/stable-diffusion-2-1", max_retries: int = 50):
     api_url = f"https://api-inference.huggingface.co/models/{model}"
     headers = {"Authorization": f"Bearer {os.getenv('HF_API_TOKEN')}"}
 
-    # Отправляем запрос
-    response = requests.post(
-        api_url,
-        headers=headers,
-        json={"inputs": prompt},
-    )
+    retries = 0
+    while retries < max_retries:
+        try:
+            # Отправляем запрос
+            response = requests.post(
+                api_url,
+                headers=headers,
+                json={"inputs": prompt},
+            )
 
-    # Проверяем успешность запроса
-    if response.status_code == 200:
-        # Сохраняем изображение
-        image_path = "generated_image.png"
-        with open(image_path, "wb") as f:
-            f.write(response.content)
-        return image_path
-    else:
-        raise Exception(f"Ошибка генерации: {response.text}")
+            # Проверяем успешность запроса
+            if response.status_code == 200:
+                # Сохраняем изображение в папку static
+                image_path = "static/generated_image.png"
+                with open(image_path, "wb") as f:
+                    f.write(response.content)
+                return image_path
+            else:
+                print(f"Ошибка генерации: {response.text}. Попытка {retries + 1} из {max_retries}")
+                retries += 1
+                time.sleep(15)  # Пауза перед следующей попыткой
+        except Exception as e:
+            print(f"Ошибка при запросе: {e}. Попытка {retries + 1} из {max_retries}")
+            retries += 1
+            time.sleep(15)  # Пауза перед следующей попыткой
 
-
-
+    raise Exception(f"Не удалось сгенерировать изображение после {max_retries} попыток")
 # Получаем API-ключ и Folder ID
 API_KEY = os.getenv("YANDEX_API_KEY")
 FOLDER_ID = os.getenv("YANDEX_FOLDER_ID")
@@ -217,32 +226,37 @@ def generate_text(prompt: str) -> str:
 
 # Пример использования
 def generate_character():
-
     # Генерация класса
     character_class = generate_class()
     print("Generated Class:", character_class)
 
     # Генерация расы
     character_race = generate_race()
-    print("Generate race:", character_race)
+    print("Generated Race:", character_race)
 
     # Генерация характеристик
     stats = generate_stats(character_race)
     print("Generated Stats:", stats)
 
     # Генерация предыстории
-    background = generate_text("in english generate only background for dnd charecter, base on:" + str(character_race) + str(character_class) + str(stats))
+    background = generate_text("in english generate only background for dnd character, based on:" + str(character_race) + str(character_class) + str(stats))
     print("Generated Background:", background)
 
-    image_path = generate_image("Create a detailed full-body image of a character facing the viewer. The character should be visualized based on their background, class, race. Here are the details:Background: " + background + "The image should be realistic, with a focus on the character's face to convey their emotions and personality. The clothing and armor should match their class and background. The background should be neutral so as not to distract from the character itself. without text. character must be all on image. character in middle ages. in fantastic world. farmat: 768x768, do not cut character!!!!!")
-    print(f"Изображение сохранено: {image_path}")
+    # Генерация изображения с повторными попытками
+    try:
+        image_path = generate_image("Create a detailed full-body image of a character facing the viewer. The character should be visualized based on their background, class, race. Here are the details:Background: " + background + "The image should be realistic, with a focus on the character's face to convey their emotions and personality. The clothing and armor should match their class and background. The background should be neutral so as not to distract from the character itself. without text. character must be all on image. character in middle ages. in fantastic world. format: 768x768, do not cut character!!!!!")
+        print(f"Изображение сохранено: {image_path}")
+    except Exception as e:
+        print(f"Ошибка при генерации изображения: {e}")
+        image_path = None  # Если изображение не удалось сгенерировать
 
     return {
-        "stats": stats,
         "class": character_class,
+        "race": character_race,
+        "stats": stats,
         "background": background,
         "image": image_path
     }
 
-# Запуск генерации персонажа
-generate_character()
+
+

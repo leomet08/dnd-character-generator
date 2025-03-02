@@ -21,8 +21,13 @@
             <h3>Background:</h3>
             <p>{{ character['background'] }}</p>
             <h3>Character Image:</h3>
-            <img src="{{ url_for('static', filename=character['image']) }}" alt="Character Image">
+            {% if character['image'] %}
+                <img src="{{ url_for('static', filename='generated_image.png') }}" alt="Character Image">
+            {% else %}
+                <p>Изображение не удалось сгенерировать.</p>
+            {% endif %}
         </div>
+        <a href="/characters">View All Characters</a>
     </div>
 </body>
 </html>
