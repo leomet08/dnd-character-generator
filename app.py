@@ -1,3 +1,4 @@
+import os
 import sqlite3
 from flask import Flask, render_template
 from main import generate_character
@@ -7,7 +8,7 @@ app = Flask(__name__)
 
 # Подключение к базе данных
 def get_db_connection():
-    conn = sqlite3.connect('characters.db')
+    conn = sqlite3.connect(os.environ.get("DB_PATH", "characters.db"))
     conn.row_factory = sqlite3.Row
     return conn
 
