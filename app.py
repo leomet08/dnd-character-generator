@@ -59,4 +59,8 @@ def show_characters():
     return render_template('characters.html', characters=characters)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(
+        host=os.environ.get("FLASK_HOST", "127.0.0.1"),
+        port=os.environ.get("FLASK_PORT", "5000"),
+        debug=True
+    )
