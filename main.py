@@ -244,7 +244,7 @@ def generate_character():
 
     # Генерация изображения с повторными попытками
     try:
-        image_path = generate_image("Create a detailed full-body image of a character facing the viewer. The character should be visualized based on their background, class, race. Here are the details:Background: " + background + "The image should be realistic, with a focus on the character's face to convey their emotions and personality. The clothing and armor should match their class and background. The background should be neutral so as not to distract from the character itself. without text. character must be all on image. character in middle ages. in fantastic world. format: 768x768, do not cut character!!!!!")
+        image_path = generate_image(background + "Create a realistic full-body image of a character facing the viewer. Focus on facial details to convey emotion and personality. Clothing/armor must align with their class and background. Neutral backdrop, medieval fantasy theme. No text. Ensure full-body visibility (768x768), no cropping. Prioritize intricate attire, expressive face, and lore accuracy. Highlight race-specific traits (e.g., elven ears, dwarven build). Avoid clutter; center the character. Style: detailed realism with subtle fantasy elements. Mood should mirror their backstory (e.g., grim for warriors, serene for mages). Middle Ages aesthetic, vibrant yet era-appropriate colors.")
         print(f"Изображение сохранено: {image_path}")
     except Exception as e:
         print(f"Ошибка при генерации изображения: {e}")
