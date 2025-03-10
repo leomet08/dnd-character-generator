@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saved Characters</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Saved Characters</h1>
+        <a href="/">Back to Main</a>
+        <div class="characters-list">
+            {% for character in characters %}
+                <div class="character">
+                    <h2>{{ character['class'] }} - {{ character['race'] }}</h2>
+                    <h3>Stats:</h3>
+                    <ul>
+                        {% for stat, value in character['stats'].items() %}
+                            <li><strong>{{ stat }}:</strong> {{ value }}</li>
+                        {% endfor %}
+                    </ul>
+                    <h3>Background:</h3>
+                    <p>{{ character['background'] }}</p>
+                    <h3>Character Image:</h3>
+                    <img src="{{ url_for('static', filename=character['image']) }}" alt="Character Image">
+                </div>
+                <hr>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,93 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    color: #333;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    width: 80%;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    text-align: center;
+    color: #444;
+}
+
+.character-info {
+    margin-top: 20px;
+}
+
+.character-info h2, .character-info h3 {
+    color: #555;
+}
+
+.character-info ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.character-info ul li {
+    background-color: #eee;
+    margin: 5px 0;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.character-info img {
+    display: block;
+    margin: 20px auto;
+    max-width: 100%;
+    height: auto;
+    border-radius: 10px;
+}
+
+/* Адаптивные стили для мобильных устройств */
+@media (max-width: 768px) {
+    .container {
+        width: 95%;
+        padding: 10px;
+    }
+
+    h1 {
+        font-size: 24px;
+    }
+
+    .character-info h2, .character-info h3 {
+        font-size: 18px;
+    }
+
+    .character-info ul li {
+        padding: 8px;
+    }
+
+    .character-info img {
+        margin: 10px auto;
+    }
+}
+
+/* Стили для кнопок */
+.buttons {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.button {
+    display: inline-block;
+    padding: 10px 20px;
+    margin: 5px;
+    background-color: #007bff;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.button:hover {
+    background-color: #0056b3;
+}
