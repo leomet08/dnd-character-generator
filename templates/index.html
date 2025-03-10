@@ -22,12 +22,17 @@
             <p>{{ character['background'] }}</p>
             <h3>Character Image:</h3>
             {% if character['image'] %}
-                <img src="{{ url_for('static', filename='generated_image.png') }}" alt="Character Image">
+                <img src="{{ url_for('static', filename=character['image']) }}" alt="Character Image">
             {% else %}
-                <p>Изображение не удалось сгенерировать.</p>
+                <p>Изображение не найдено.</p>
             {% endif %}
         </div>
-        <a href="/characters">View All Characters</a>
+
+        <!-- Кнопки для управления -->
+        <div class="buttons">
+            <a href="/generate" class="button">Generate New Character</a>
+            <a href="/characters" class="button">View All Characters</a>
+        </div>
     </div>
 </body>
 </html>
