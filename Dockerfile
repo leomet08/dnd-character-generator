@@ -10,7 +10,6 @@ RUN --mount=type=cache,target=/root/.cache/pip \
     poetry install --no-root --no-cache
 
 COPY start_service.sh generated_image.png .env *.py ./
-COPY static static
 COPY templates templates
 
 EXPOSE 5000
