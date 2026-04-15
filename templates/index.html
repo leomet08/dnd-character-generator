@@ -5,34 +5,85 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>D&D Character Generator</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <!-- Подключаем Google Fonts для фэнтези-шрифтов -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
+    <!-- Font Awesome для иконок (опционально) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
+    <!-- Оверлей с лоадером (изначально скрыт) -->
+    <div id="loader" class="loader-overlay hidden">
+        <div class="loader"></div>
+        <p class="loading-text">The Fates are weaving your tale...</p>
+    </div>
+
     <div class="container">
-        <h1>D&D Character Generator</h1>
-        <div class="character-info">
-            <h2>Class: {{ character['class'] }}</h2>
-            <h2>Race: {{ character['race'] }}</h2>
-            <h3>Stats:</h3>
-            <ul>
-                {% for stat, value in character['stats'].items() %}
-                    <li><strong>{{ stat }}:</strong> {{ value }}</li>
-                {% endfor %}
-            </ul>
-            <h3>Background:</h3>
-            <p>{{ character['background'] }}</p>
-            <h3>Character Image:</h3>
-            {% if character['image'] %}
-                <img src="{{ url_for('static', filename=character['image']) }}" alt="Character Image">
-            {% else %}
-                <p>Изображение не найдено.</p>
-            {% endif %}
+        <h1><i class="fas fa-dragon"></i> D&D Character Forge <i class="fas fa-dragon"></i></h1>
+
+        <!-- Контейнер для информации о персонаже -->
+        <div id="character-info" class="character-info">
+            <!-- Будет заполнен через JavaScript -->
         </div>
 
-        <!-- Кнопки для управления -->
         <div class="buttons">
-            <a href="/generate" class="button">Generate New Character</a>
-            <a href="/characters" class="button">View All Characters</a>
+            <button id="generate-btn" class="button"><i class="fas fa-dice-d20"></i> Forge a New Hero</button>
+            <a href="/characters" class="button"><i class="fas fa-users"></i> Hall of Heroes</a>
         </div>
     </div>
+
+    <script>
+        const loader = document.getElementById('loader');
+        const characterInfo = document.getElementById('character-info');
+        const generateBtn = document.getElementById('generate-btn');
+
+        // Функция для отображения персонажа в DOM
+        function renderCharacter(character) {
+            let statsHtml = '';
+            for (const [stat, value] of Object.entries(character.stats)) {
+                statsHtml += `<li><strong>${stat}:</strong> ${value}</li>`;
+            }
+            characterInfo.innerHTML = `
+                <h2><i class="fas fa-hat-wizard"></i> ${character.class}</h2>
+                <h2><i class="fas fa-paw"></i> ${character.race}</h2>
+                <h3><i class="fas fa-chart-bar"></i> Attributes</h3>
+                <ul class="stats-list">${statsHtml}</ul>
+                <h3><i class="fas fa-scroll"></i> Background</h3>
+                <p class="background-text">${character.background}</p>
+                <h3><i class="fas fa-portrait"></i> Portrait</h3>
+                <img src="/static/${character.image}?t=${new Date().getTime()}" alt="Character Portrait" class="character-portrait">
+            `;
+        }
+
+        // Загрузка существующего персонажа при открытии страницы
+        window.addEventListener('DOMContentLoaded', () => {
+            {% if character %}
+                renderCharacter({{ character | tojson | safe }});
+            {% else %}
+                // Если персонажа нет (например, первый запуск), можно показать заглушку или ничего
+                characterInfo.innerHTML = '<p class="no-character">No hero yet. Click "Forge a New Hero" to begin your adventure!</p>';
+            {% endif %}
+        });
+
+        // Обработчик нажатия на кнопку генерации
+        generateBtn.addEventListener('click', async () => {
+            loader.classList.remove('hidden');
+            try {
+                const response = await fetch('/api/generate', { method: 'POST' });
+                const data = await response.json();
+                if (data.success) {
+                    renderCharacter(data.character);
+                } else {
+                    alert('Ошибка генерации: ' + data.error);
+                    // Можно показать сообщение в интерфейсе
+                }
+            } catch (err) {
+                alert('Сетевая ошибка: ' + err.message);
+            } finally {
+                loader.classList.add('hidden');
+            }
+        });
+    </script>
 </body>
 </html>

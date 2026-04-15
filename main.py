@@ -72,7 +72,23 @@ RACE_BONUSES = {
     "Hexblood": {"any_two": 1},  # +1 к двум характеристикам на выбор
     "Reborn": {"any_two": 1},  # +1 к двум характеристикам на выбор
 }
+STARTING_EQUIPMENT = {
+    "Barbarian": ["Greataxe", "Handaxe (2)", "Explorer's Pack", "Javelin (4)"],
+    "Bard": ["Rapier", "Entertainer's Pack", "Lute", "Leather Armor", "Dagger"],
+    "Cleric": ["Mace", "Scale Mail", "Shield", "Priest's Pack", "Holy Symbol"],
+    "Druid": ["Scimitar", "Leather Armor", "Explorer's Pack", "Druidic Focus"],
+    "Fighter": ["Longsword", "Shield", "Chain Mail", "Dungeoneer's Pack"],
+    "Monk": ["Shortsword", "Dungeoneer's Pack", "Darts (10)"],
+    "Paladin": ["Longsword", "Shield", "Chain Mail", "Priest's Pack"],
+    "Ranger": ["Longbow", "Quiver of 20 arrows", "Scale Mail", "Explorer's Pack"],
+    "Rogue": ["Rapier", "Shortbow", "Burglar's Pack", "Leather Armor", "Thieves' Tools"],
+    "Sorcerer": ["Quarterstaff", "Arcane Focus", "Explorer's Pack", "Dagger"],
+    "Warlock": ["Light Crossbow", "Arcane Focus", "Scholar's Pack", "Leather Armor"],
+    "Wizard": ["Spellbook", "Arcane Focus", "Scholar's Pack", "Dagger"]
+}
 
+def generate_equipment(character_class):
+    return STARTING_EQUIPMENT.get(character_class, ["Adventurer's Kit", "Pouch of 10gp"])
 
 def apply_race_bonuses(stats, race):
     bonuses = RACE_BONUSES.get(race, {})
@@ -166,42 +182,39 @@ import time
 
 load_dotenv()  # Загружаем токен из .env
 
-def generate_image(prompt: str, character_id: int, model: str = "stabilityai/stable-diffusion-2-1", max_retries: int = 50):
-    api_url = f"https://api-inference.huggingface.co/models/{model}"
-    headers = {"Authorization": f"Bearer {os.getenv('HF_API_TOKEN')}"}
+import os
+from yandex_ai_studio_sdk import AIStudio
 
-    # Генерация уникального имени файла
-    image_filename = f"generated_image_{character_id}.png"
-    image_path = os.path.join("static", image_filename)  # Правильный путь
 
-    retries = 0
-    while retries < max_retries:
-        try:
-            # Отправляем запрос
-            response = requests.post(
-                api_url,
-                headers=headers,
-                json={"inputs": prompt},
-            )
+def generate_image_with_sdk(prompt: str, character_id: int):
+    try:
+        # Инициализация клиента
+        sdk = AIStudio(
+            folder_id=os.getenv('YC_FOLDER_ID'),
+            auth=os.getenv('YC_API_KEY')
+        )
 
-            # Проверяем успешность запроса
-            if response.status_code == 200:
-                # Сохраняем изображение
-                with open(image_path, "wb") as f:
-                    f.write(response.content)
-                return image_filename  # Возвращаем имя файла
-            else:
-                print(f"Ошибка генерации: {response.text}. Попытка {retries + 1} из {max_retries}")
-                retries += 1
-                time.sleep(60)  # Пауза перед следующей попыткой
-        except Exception as e:
-            print(f"Ошибка при запросе: {e}. Попытка {retries + 1} из {max_retries}")
-            retries += 1
-            time.sleep(60)  # Пауза перед следующей попыткой
+        # Генерация изображения
+        model = sdk.models.image_generation("yandex-art")
+        operation = model.run_deferred(prompt)
+        result = operation.wait()
 
-    # Если изображение не сгенерировалось, возвращаем заглушку
-    return 'placeholder.png'
+        # Получение байтов изображения
+        image_bytes = result._repr_jpeg_()
 
+        # Сохранение файла
+        image_filename = f"generated_image_{character_id}.png"
+        image_path = os.path.join("static", image_filename)
+        os.makedirs("static", exist_ok=True)
+
+        with open(image_path, "wb") as f:
+            f.write(image_bytes)
+
+        return image_filename
+
+    except Exception as e:
+        print(f"Ошибка при работе с SDK: {e}")
+        return 'placeholder.png'
 # Получаем API-ключ и Folder ID
 API_KEY = os.getenv("YANDEX_API_KEY")
 FOLDER_ID = os.getenv("YANDEX_FOLDER_ID")
@@ -250,14 +263,14 @@ def generate_character():
     background = generate_text("in english generate only background for dnd character, based on:" + str(character_race) + str(character_class) + str(stats))
     print("Generated Background:", background)
 
-
-
+    equipment = generate_equipment(character_class)
 
     return {
         "class": character_class,
         "race": character_race,
         "stats": stats,
         "background": background,
+        "equipment": equipment
 
     }
 

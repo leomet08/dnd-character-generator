@@ -1,8 +1,8 @@
 import json
 import os
 import sqlite3
-from flask import Flask, render_template, redirect, url_for
-from main import generate_character, generate_image
+from flask import Flask, render_template, redirect, url_for, jsonify
+from main import generate_character, generate_image_with_sdk
 from time import time
 
 app = Flask(__name__)
@@ -48,7 +48,7 @@ def init_db():
 
     # Создаём индекс для ускорения поиска по character_id
     conn.execute('CREATE INDEX IF NOT EXISTS idx_character_stats_character_id ON character_stats (character_id)')
-
+    conn.execute('ALTER TABLE characters ADD COLUMN equipment TEXT')
     conn.commit()
     conn.close()
 
@@ -102,8 +102,9 @@ def index():
         character_id = cursor.lastrowid
 
         # Генерируем уникальное изображение
-        image_filename = generate_image(
-            prompt=character['background'],
+        prompt = f"D&D character portrait: {character['race']} {character['class']}. {character['background']}. Fantasy art, digital painting, highly detailed, dramatic lighting."
+        image_filename = generate_image_with_sdk(
+            prompt=prompt,
             character_id=character_id
         )
 
@@ -154,8 +155,9 @@ def generate_new_character():
     character_id = cursor.lastrowid
 
     # Генерируем уникальное изображение
-    image_filename = generate_image(
-        prompt=character['background'],
+    prompt = f"D&D character portrait: {character['race']} {character['class']}. {character['background']}. Fantasy art, digital painting, highly detailed, dramatic lighting."
+    image_filename = generate_image_with_sdk(
+        prompt=prompt,
         character_id=character_id
     )
 
@@ -197,10 +199,53 @@ def show_characters():
         return render_template('characters.html', characters=characters_list)
     except sqlite3.Error as e:
         return f"Ошибка базы данных: {e}", 500
+from flask import jsonify
+
+@app.route('/api/generate', methods=['POST'])
+def api_generate_character():
+    """Генерирует нового персонажа и возвращает JSON."""
+    try:
+        # Генерация данных персонажа (быстро)
+        character = generate_character()
+        conn = get_db_connection()
+
+        # Вставляем запись с временным изображением
+        cursor = conn.execute('''
+            INSERT INTO characters (class, race, background, image, stats)
+            VALUES (?, ?, ?, ?, ?)
+        ''', (
+            character['class'],
+            character['race'],
+            character['background'],
+            'placeholder.png',
+            json.dumps(character['stats'])
+        ))
+        character_id = cursor.lastrowid
+
+        # Генерация изображения (долго)
+        image_filename = generate_image_with_sdk(
+            prompt=character['background'],
+            character_id=character_id
+        )
+
+        # Обновляем имя файла изображения
+        conn.execute('UPDATE characters SET image = ? WHERE id = ?', (image_filename, character_id))
+        conn.commit()
+        conn.close()
+
+        return jsonify({
+            'success': True,
+            'character': {
+                'id': character_id,
+                'class': character['class'],
+                'race': character['race'],
+                'background': character['background'],
+                'stats': character['stats'],
+                'image': image_filename
+            }
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 if __name__ == '__main__':
-    app.run(
-        host=os.environ.get("FLASK_HOST", "127.0.0.1"),
-        port=os.environ.get("FLASK_PORT", "5000"),
-        debug=True
-    )
+    app.run(host='0.0.0.0', port=5000, debug=False)
