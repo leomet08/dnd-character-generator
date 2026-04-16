@@ -2,17 +2,20 @@ FROM python:3.11.11-slim
 
 WORKDIR /usr/src/app
 
-COPY pyproject.toml poetry.lock ./
+# Копируем файл зависимостей
+COPY requirements.txt .
 
-RUN --mount=type=cache,target=/root/.cache/pip \
-    pip install -U poetry==1.8.3 && \
-    poetry config virtualenvs.create false && \
-    poetry install --no-root --no-cache
+# Устанавливаем зависимости через pip
+RUN pip install --no-cache-dir -r requirements.txt
 
-COPY start_service.sh generated_image.png .env *.py ./
+# Копируем остальные файлы приложения (без .env)
+COPY start_service.sh generated_image.png *.py ./
 COPY static static
 COPY templates templates
 
+# Создаём папку static (если её нет)
+RUN mkdir -p static
+
 EXPOSE 5000
 
-CMD bash start_service.sh
+CMD ["bash", "start_service.sh"]

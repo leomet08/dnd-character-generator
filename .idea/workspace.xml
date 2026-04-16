@@ -4,24 +4,40 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="01e04915-d544-467c-945b-21660c5328e1" name="Changes" comment="новая стилистика" />
+    <list default="true" id="01e04915-d544-467c-945b-21660c5328e1" name="Changes" comment="доработки">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="27" />
+    <option name="cachedIndexableFilesCount" value="31" />
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="Python Script" />
         <option value="HTML File" />
+        <option value="Dockerfile" />
       </list>
     </option>
   </component>
   <component name="Git.Settings">
+    <excluded-from-favorite>
+      <branch-storage>
+        <map>
+          <entry type="LOCAL">
+            <value>
+              <list>
+                <branch-info repo="$PROJECT_DIR$" source="main" />
+              </list>
+            </value>
+          </entry>
+        </map>
+      </branch-storage>
+    </excluded-from-favorite>
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
         <entry key="$PROJECT_DIR$" value="dev(#2)" />
@@ -74,7 +90,7 @@
     &quot;git-widget-placeholder&quot;: &quot;main&quot;,
     &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
     &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/leoni/PycharmProjects/dnd-character-generator/static&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/leoni/PycharmProjects/dnd-character-generator_1111&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
@@ -87,10 +103,11 @@
 }</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\leoni\PycharmProjects\dnd-character-generator_1111" />
       <recent name="C:\Users\leoni\PycharmProjects\dnd-character-generator\static" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.app">
+  <component name="RunManager" selected="Docker.Dockerfile">
     <configuration name="app" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="dnd-character-generator" />
       <option name="ENV_FILES" value="" />
@@ -183,8 +200,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.app" />
         <item itemvalue="Docker.Dockerfile" />
+        <item itemvalue="Python.app" />
         <item itemvalue="Python.test" />
         <item itemvalue="Python.main" />
         <item itemvalue="Python.app" />
@@ -337,7 +354,31 @@
       <option name="project" value="LOCAL" />
       <updated>1776245187123</updated>
     </task>
-    <option name="localTasksCounter" value="17" />
+    <task id="LOCAL-00017" summary="новая стилистика">
+      <option name="closed" value="true" />
+      <created>1776245558208</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1776245558208</updated>
+    </task>
+    <task id="LOCAL-00018" summary="доработки">
+      <option name="closed" value="true" />
+      <created>1776343410031</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1776343410031</updated>
+    </task>
+    <task id="LOCAL-00019" summary="доработки">
+      <option name="closed" value="true" />
+      <created>1776343510054</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1776343510054</updated>
+    </task>
+    <option name="localTasksCounter" value="20" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -403,6 +444,7 @@
     <MESSAGE value="comit" />
     <MESSAGE value="переход на модель яндекса" />
     <MESSAGE value="новая стилистика" />
-    <option name="LAST_COMMIT_MESSAGE" value="новая стилистика" />
+    <MESSAGE value="доработки" />
+    <option name="LAST_COMMIT_MESSAGE" value="доработки" />
   </component>
 </project>

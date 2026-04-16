@@ -260,3 +260,92 @@ h2 i, h3 i {
         border-width: 3px;
     }
 }
+/* === Главная страница === */
+.home-container {
+    text-align: center;
+    max-width: 700px;
+}
+
+.tagline {
+    font-family: 'Cinzel', serif;
+    font-size: 1.3rem;
+    color: #c9a87c;
+    margin-bottom: 50px;
+    text-shadow: 1px 1px 0 #1f140e;
+    letter-spacing: 2px;
+}
+
+.home-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    margin: 40px 0;
+}
+
+.home-button {
+    display: block;
+    background: rgba(30, 15, 10, 0.8);
+    border: 3px solid #b89b7b;
+    border-radius: 50px;
+    padding: 30px 40px;
+    text-decoration: none;
+    color: #f3e7d3;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 0 #2c1a0c, 0 10px 20px rgba(0,0,0,0.5);
+    backdrop-filter: blur(4px);
+}
+
+.home-button:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 13px 0 #2c1a0c, 0 15px 30px rgba(0,0,0,0.6);
+    background: rgba(50, 25, 15, 0.9);
+    border-color: #d4b483;
+}
+
+.home-button i {
+    font-size: 3rem;
+    display: block;
+    margin-bottom: 15px;
+    color: #c9a87c;
+}
+
+.home-button span {
+    display: block;
+    font-family: 'Cinzel', serif;
+    font-size: 2rem;
+    font-weight: bold;
+    letter-spacing: 3px;
+    margin-bottom: 10px;
+}
+
+.home-button small {
+    display: block;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.2rem;
+    opacity: 0.8;
+}
+
+.home-footer {
+    margin-top: 60px;
+    font-family: 'Cinzel', serif;
+    color: #b89b7b;
+    font-size: 0.9rem;
+}
+
+@media (max-width: 600px) {
+    .home-button {
+        padding: 20px 25px;
+    }
+    .home-button span {
+        font-size: 1.5rem;
+    }
+    .home-button i {
+        font-size: 2.5rem;
+    }
+}
+.button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: 0 4px 0 #2c1a0c;
+}

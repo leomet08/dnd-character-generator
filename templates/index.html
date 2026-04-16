@@ -5,11 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>D&D Character Generator</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-    <!-- Подключаем Google Fonts для фэнтези-шрифтов -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
-    <!-- Font Awesome для иконок (опционально) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
@@ -24,12 +22,20 @@
 
         <!-- Контейнер для информации о персонаже -->
         <div id="character-info" class="character-info">
-            <!-- Будет заполнен через JavaScript -->
+            {% if character %}
+                <script>
+                    // Передаём данные из Flask в JavaScript
+                    window.initialCharacter = {{ character | tojson | safe }};
+                </script>
+            {% else %}
+                <p class="no-character">No hero yet. Click "Forge a New Hero" to begin your adventure!</p>
+            {% endif %}
         </div>
 
         <div class="buttons">
             <button id="generate-btn" class="button"><i class="fas fa-dice-d20"></i> Forge a New Hero</button>
             <a href="/characters" class="button"><i class="fas fa-users"></i> Hall of Heroes</a>
+            <a href="/" class="button"><i class="fas fa-home"></i> Home</a>
         </div>
     </div>
 
@@ -37,9 +43,12 @@
         const loader = document.getElementById('loader');
         const characterInfo = document.getElementById('character-info');
         const generateBtn = document.getElementById('generate-btn');
+        let isGenerating = false;
+        let currentCharacter = null;
 
-        // Функция для отображения персонажа в DOM
+        // Функция отрисовки персонажа
         function renderCharacter(character) {
+            currentCharacter = character;
             let statsHtml = '';
             for (const [stat, value] of Object.entries(character.stats)) {
                 statsHtml += `<li><strong>${stat}:</strong> ${value}</li>`;
@@ -56,19 +65,20 @@
             `;
         }
 
-        // Загрузка существующего персонажа при открытии страницы
+        // При загрузке страницы проверяем, есть ли переданный персонаж
         window.addEventListener('DOMContentLoaded', () => {
-            {% if character %}
-                renderCharacter({{ character | tojson | safe }});
-            {% else %}
-                // Если персонажа нет (например, первый запуск), можно показать заглушку или ничего
-                characterInfo.innerHTML = '<p class="no-character">No hero yet. Click "Forge a New Hero" to begin your adventure!</p>';
-            {% endif %}
+            if (window.initialCharacter) {
+                renderCharacter(window.initialCharacter);
+            }
         });
 
-        // Обработчик нажатия на кнопку генерации
+        // Обработчик кнопки генерации
         generateBtn.addEventListener('click', async () => {
+            if (isGenerating) return;
+            isGenerating = true;
+            generateBtn.disabled = true;
             loader.classList.remove('hidden');
+
             try {
                 const response = await fetch('/api/generate', { method: 'POST' });
                 const data = await response.json();
@@ -76,12 +86,13 @@
                     renderCharacter(data.character);
                 } else {
                     alert('Ошибка генерации: ' + data.error);
-                    // Можно показать сообщение в интерфейсе
                 }
             } catch (err) {
                 alert('Сетевая ошибка: ' + err.message);
             } finally {
                 loader.classList.add('hidden');
+                generateBtn.disabled = false;
+                isGenerating = false;
             }
         });
     </script>

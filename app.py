@@ -49,6 +49,7 @@ def init_db():
     # Создаём индекс для ускорения поиска по character_id
     conn.execute('CREATE INDEX IF NOT EXISTS idx_character_stats_character_id ON character_stats (character_id)')
     conn.execute('ALTER TABLE characters ADD COLUMN equipment TEXT')
+    conn.execute('PRAGMA journal_mode=WAL')
     conn.commit()
     conn.close()
 
@@ -81,59 +82,23 @@ def fix_stats_format():
 
 # Вызов функции для исправления данных (запустите один раз, затем закомментируйте)
 fix_stats_format()
+# Удалите или закомментируйте старый маршрут '/' и замените на новый:
+
 @app.route('/')
-def index():
-    global character, image_filename
-    if character is None:
-        character = generate_character()
-        conn = get_db_connection()
+def home():
+    """Главная страница с выбором действий."""
+    return render_template('home.html')
 
-        # Сохраняем персонажа с временным изображением
-        cursor = conn.execute('''
-            INSERT INTO characters (class, race, background, image, stats)
-            VALUES (?, ?, ?, ?, ?)
-        ''', (
-            character['class'],
-            character['race'],
-            character['background'],
-            'placeholder.png',  # Временное значение
-            json.dumps(character['stats'])  # Преобразуем stats в JSON
-        ))
-        character_id = cursor.lastrowid
-
-        # Генерируем уникальное изображение
-        prompt = f"D&D character portrait: {character['race']} {character['class']}. {character['background']}. Fantasy art, digital painting, highly detailed, dramatic lighting."
-        image_filename = generate_image_with_sdk(
-            prompt=prompt,
-            character_id=character_id
-        )
-
-        # Обновляем запись с реальным именем изображения
-        conn.execute('''
-            UPDATE characters SET image = ? WHERE id = ?
-        ''', (image_filename, character_id))
-
-        # Сохраняем характеристики
-        for stat, value in character['stats'].items():
-            conn.execute('''
-                INSERT INTO character_stats (character_id, stat_name, stat_value)
-                VALUES (?, ?, ?)
-            ''', (character_id, stat, value))
-
-        conn.commit()
-        conn.close()
-
-    # Получаем актуальные данные из базы данных
+@app.route('/forge')
+def forge():
     conn = get_db_connection()
-    character_db = conn.execute('SELECT * FROM characters WHERE id = (SELECT MAX(id) FROM characters)').fetchone()
+    last_char = conn.execute('SELECT * FROM characters ORDER BY id DESC LIMIT 1').fetchone()
     conn.close()
-
-    if character_db:
-        character = dict(character_db)
+    character = None
+    if last_char:
+        character = dict(last_char)
         character['stats'] = json.loads(character['stats'])
-        return render_template('index.html', character=character, timestamp=int(time()))
-    else:
-        return "Character not found", 404
+    return render_template('index.html', character=character)
 
 @app.route('/generate')
 def generate_new_character():
